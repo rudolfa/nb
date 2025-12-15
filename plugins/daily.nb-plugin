@@ -19,6 +19,8 @@ _subcommands describe "daily" <<HEREDOC
 $(_color_primary "Usage"):
   ${_ME} daily [<content>] [--prev [<number>]]
 
+Modified by Andy.
+
 $(_color_primary "Options"):
   --prev [<number>]   List previous days and show day by previous <number>.
 
@@ -68,7 +70,7 @@ _daily() {
   _notebook_path="$(_notebooks current --path)"
 
   local _target_filename=
-  _target_filename="$(date "+%Y%m%d").md"
+  _target_filename="$(date "+%Y%m%d").${NB_DEFAULT_EXTENSION}"
 
   local _target_path=
   _target_path="${_notebook_path}/${_target_filename}"
@@ -92,7 +94,7 @@ _daily() {
       find "${_notebook_path:-}"                                  \
         -maxdepth 1                                               \
         -type     f                                               \
-        -name     "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].md"   \
+        -name     "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].${NB_DEFAULT_EXTENSION}"   \
         | sort                                                    \
         | sed '1!G;h;$!d' # https://stackoverflow.com/a/744093
     ))
@@ -149,8 +151,13 @@ _daily() {
 
     local _timestamped_content="\
 ## ${_timestamp}
-
 ${_formatted_content}"
+
+    if [ "${NB_DEFAULT_EXTENSION}" = "adoc" ]; then
+    _timestamped_content="\
+== ${_timestamp}
+${_formatted_content}"
+    fi
 
     if [[ ! -e "${_target_path:-}"  ]]
     then
